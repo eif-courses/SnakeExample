@@ -10,7 +10,7 @@
 #include <algorithm>
 
 #include <SFML/Graphics.hpp>
-
+// XOR
 // snake can't reverse direction
 #define REVERSED_DIRECTION_X (0b0001 ^ 0b0010)
 #define REVERSED_DIRECTION_Y (0b0100 ^ 0b1000)

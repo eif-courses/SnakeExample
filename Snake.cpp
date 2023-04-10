@@ -27,9 +27,10 @@ Snake::Snake()
 
     window_.setFramerateLimit(7);
 
-    std::int32_t c{FIELD_SIZE / 2};
+    int start_pos_x{FIELD_SIZE / 2};
+    int start_pos_y{FIELD_SIZE / 2};
     snake_.reserve(FIELD_SIZE * FIELD_SIZE);
-    snake_.push_back({c, c});
+    snake_.push_back({start_pos_x, start_pos_y});
 
     fruit_ = CreateFruit();
 
@@ -51,7 +52,7 @@ void Snake::Run() {
             Move();
         }
 
-        Draw();
+        Draw(dir_);
     }
 }
 
@@ -77,7 +78,7 @@ void Snake::HandleEvent(const sf::Event &e) {
     }
 }
 
-void Snake::Draw() {
+void Snake::Draw(Direction &direction) {
     window_.clear(BACKGROUND_COLOR);
 
     sf::RectangleShape rect{};
@@ -87,17 +88,40 @@ void Snake::Draw() {
     for (auto it: snake_) {
         rect.setSize(sf::Vector2f(SHAPE_SIZE - 2, SHAPE_SIZE - 2));
         rect.setPosition(it.x * PIXEL_SIZE + 1, it.y * PIXEL_SIZE + 1);
+
+
+        // TODO need tidy up code
         if (count == 0) {
 
-            rect.setFillColor(sf::Color::White);
-            rect.setOutlineColor(BACKGROUND_COLOR);
-            rect.setOutlineThickness(1);
-//            if (!textureFront.loadFromFile("head.png")) {
-//                // Handle error loading texture
-//            }
-//            rect.setTexture(&textureFront);
+//            rect.setFillColor(sf::Color::White);
+//            rect.setOutlineColor(BACKGROUND_COLOR);
+//            rect.setOutlineThickness(1);
+
+            if (direction == Direction::kLeft) {
+                std::cout << "LEFT" << std::endl;
+                if (!textureFront.loadFromFile("head_sheet.png", sf::IntRect(0, 24, 24, 24))) {
+                    // error...
+                }
+                rect.setTexture(&textureFront);
+            } else if (direction == Direction::kRight) {
+
+                if (!textureFront.loadFromFile("head_sheet.png", sf::IntRect(24, 0, 24, 24))) {
+                    // error...
+                }
+                rect.setTexture(&textureFront);
+            } else if (direction == Direction::kDown) {
+                if (!textureFront.loadFromFile("head_sheet.png", sf::IntRect(24, 24, 24, 24))) {
+                    // error...
+                }
+                rect.setTexture(&textureFront);
+            } else if (direction == Direction::kUp) {
+                if (!textureFront.loadFromFile("head_sheet.png", sf::IntRect(0, 0, 24, 24))) {
+                    // error...
+                }
+                rect.setTexture(&textureFront);
+            }
         } else {
-            //rect.setTexture(nullptr);
+            rect.setTexture(nullptr);
 
             rect.setFillColor(sf::Color::Green);
             rect.setOutlineColor(BACKGROUND_COLOR);
@@ -171,13 +195,15 @@ void Snake::Move() {
         }
     }
 
-    // Collision for fruit
+    // Filling map with snake rectangle each step
     snake_.insert(snake_.begin(), new_head);
+    // Collision for fruit
     if (new_head.x == fruit_.x && new_head.y == fruit_.y) {
         score_++;
         fruit_ = CreateFruit();
         SetTitle();
     } else {
+        // Destroying each previous rendering Rectangle
         snake_.pop_back();
     }
 }

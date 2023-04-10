@@ -49,7 +49,7 @@ public:
 
     void Run();
     void HandleEvent(const sf::Event &e);
-    void Draw();
+    void Draw(Direction &direction);
     void Move();
     void SetTitle();
     pos CreateFruit();

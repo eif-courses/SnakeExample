@@ -11,8 +11,13 @@
 
 #include <SFML/Graphics.hpp>
 
-#define FIELD_SIZE 21
 
+
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 1024;
+const int PIXEL_SIZE = 80;
+const int SHAPE_SIZE = PIXEL_SIZE - 10;
+const int FIELD_SIZE = SCREEN_WIDTH / PIXEL_SIZE;
 struct pos {
     std::int32_t y{}, x{};
 };

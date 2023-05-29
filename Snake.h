@@ -12,11 +12,10 @@
 #include <SFML/Graphics.hpp>
 
 
-
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 1024;
-const int PIXEL_SIZE = 80;
-const int SHAPE_SIZE = PIXEL_SIZE - 10;
+const int PIXEL_SIZE = 40;
+const int SHAPE_SIZE = PIXEL_SIZE - 5;
 const int FIELD_SIZE = SCREEN_WIDTH / PIXEL_SIZE;
 struct pos {
     std::int32_t y{}, x{};
@@ -35,10 +34,9 @@ private:
     sf::RenderWindow window_{};
 
     std::size_t score_{};
-
+    int speed{};
     pos fruit_{};
     std::vector<pos> snake_{};
-
     Direction dir_{};
 
     bool game_over_{};

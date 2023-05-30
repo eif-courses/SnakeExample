@@ -25,7 +25,7 @@ int endAlpha = 255;
 int targetTime = 3000;
 sf::RectangleShape fade;
 auto snake_color = sf::Color::Yellow;
-
+std::vector<pos> collected_fruits;
 
 
 Snake::Snake()
@@ -324,8 +324,16 @@ void Snake::Move() {
     // Collision for fruit
     if (new_head.x == fruit_.x && new_head.y == fruit_.y) {
         score_++;
-        fruit_ = CreateFruit();
+        collected_fruits.emplace_back(fruit_);
         std::cout << "You picked: " << fruit_.image << std::endl;
+        fruit_ = CreateFruit();
+
+
+
+        for (const auto &item:collected_fruits) {
+            std::cout << item.image << " ";
+        }
+
         SetTitle();
     } else {
         // Destroying each previous rendering Rectangle
@@ -353,8 +361,6 @@ pos Snake::CreateFruit() {
     std::mt19937 gen{rd()};
     std::uniform_int_distribution<> next(0, FIELD_SIZE - 1);
 
-
-
     const int NUM_IMAGES = 5;
     std::srand(std::time(0));
     std::string images[NUM_IMAGES] = {
@@ -372,6 +378,7 @@ pos Snake::CreateFruit() {
     //pos koordinate{1, 2};
 
     pos new_fruit{next(gen), next(gen), images[randomIndex]};
+
     auto f = [&new_fruit](const pos &val) {
         return new_fruit.x == val.x && new_fruit.y == val.y;
     };
@@ -380,7 +387,7 @@ pos Snake::CreateFruit() {
         new_fruit.x = next(gen);
         new_fruit.y = next(gen);
     }
-
+    fruit_ = new_fruit;
     return new_fruit;
 }
 

@@ -213,7 +213,8 @@ void Snake::Draw(Direction &direction) {
 
 
     sf::Texture texture;
-    if (!texture.loadFromFile(fruit_.image)) {
+    // 96 x 37
+    if (!texture.loadFromFile("butterfly.png",sf::IntRect(0, 0, 96, 37))) {
         // Handle error loading texture
     }
 

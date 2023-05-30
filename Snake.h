@@ -12,10 +12,10 @@
 #include <SFML/Graphics.hpp>
 
 
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 1024;
-const int PIXEL_SIZE = 40;
-const int SHAPE_SIZE = PIXEL_SIZE - 5;
+const int SCREEN_WIDTH = 1400;
+const int SCREEN_HEIGHT = 1400;
+const int PIXEL_SIZE = 70;
+const int SHAPE_SIZE = PIXEL_SIZE - 1;
 const int FIELD_SIZE = SCREEN_WIDTH / PIXEL_SIZE;
 struct pos {
     std::int32_t y{}, x{};

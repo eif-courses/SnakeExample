@@ -8,7 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <sysinfoapi.h>
 #include <windows.h>
@@ -27,6 +27,12 @@ sf::RectangleShape fade;
 auto snake_color = sf::Color::Yellow;
 std::vector<pos> collected_fruits;
 
+sf::Music background_music;
+sf::Music music;
+sf::Texture animatedTexture;
+sf::IntRect rectSourceSprite;
+sf::Clock clockForAnimation;
+sf::Sprite animatedFruit;
 
 Snake::Snake()
         : score_{1},
@@ -35,6 +41,9 @@ Snake::Snake()
           dir_{Direction::kNone},
           speed{7},
           game_over_{false} {
+
+
+
 
     window_.setFramerateLimit(speed);
 
@@ -55,6 +64,22 @@ Snake::~Snake() {
 void Snake::Run() {
 
 
+    rectSourceSprite = sf::IntRect(0, 0, 68, 70);
+    animatedFruit = sf::Sprite(animatedTexture,rectSourceSprite);
+
+
+    if (!background_music.openFromFile("background.flac")){
+        std::cout << "No sound!";
+    }
+    background_music.play();
+
+    if (!music.openFromFile("crunch.wav")){
+        std::cout << "No sound!";
+    }
+
+
+
+
     while (window_.isOpen()) {
 
 
@@ -67,8 +92,12 @@ void Snake::Run() {
             Move();
         }
 
+
         Draw(dir_);
 
+        //window_.clear();
+
+        //window_.display();
 
     }
 }
@@ -116,7 +145,6 @@ void Snake::Draw(Direction &direction) {
 
     window_.clear(BACKGROUND_COLOR);
 
-
     sf::Font font;
     if (!font.loadFromFile("font.ttf")) {
         std::cout << "Failed";
@@ -143,7 +171,7 @@ void Snake::Draw(Direction &direction) {
 
 
     for (auto it: snake_) {
-        rect.setSize(sf::Vector2f(SHAPE_SIZE - 2, SHAPE_SIZE - 2));
+        rect.setSize(sf::Vector2f(SHAPE_SIZE - 1, SHAPE_SIZE - 1));
         rect.setPosition(it.x * PIXEL_SIZE + 1, it.y * PIXEL_SIZE + 1);
 
 
@@ -212,25 +240,26 @@ void Snake::Draw(Direction &direction) {
     rect.setPosition(fruit_.x * PIXEL_SIZE + 1, fruit_.y * PIXEL_SIZE + 1);
 
 
-    sf::Texture texture;
-    // 96 x 37
-    if (!texture.loadFromFile("butterfly.png",sf::IntRect(0, 0, 96, 37))) {
+
+    // ANIMATION FOR FRUITS
+    if (!animatedTexture.loadFromFile("fruits.png")) {
         // Handle error loading texture
     }
+    // END OF ANIMATION FRUITS
 
-    // Set the texture of the rectangle shape
-    //rect.setFillColor(sf::Color::White);
-   // texture.create(40,40);
-    rect.setTexture(&texture);
+    if (clockForAnimation.getElapsedTime().asMilliseconds() > 50){
+        if (rectSourceSprite.left == 280) {
+            rectSourceSprite.left = 0;
+        }
+        else {
+            rectSourceSprite.left += 70;
+        }
+        animatedFruit.setTextureRect(rectSourceSprite);
+        clockForAnimation.restart();
+    }
+    rect.setTexture(animatedFruit.getTexture());
+    rect.setTextureRect(rectSourceSprite);
 
-
-
-
-    //text.setString("Score: " + score);
-    //text.setCharacterSize(48); // in pixels, not points!
-    //text.setFillColor(sf::Color::Red);
-    // text.setStyle(sf::Text::Bold | sf::Text::Underlined);
-    //text.setPosition(2,2);
 
     if(score_ == 5) {
         sf::Text achievment;
@@ -267,6 +296,9 @@ void Snake::Draw(Direction &direction) {
         window_.draw(fade);
         window_.draw(achievment);
     }
+
+
+    window_.draw(animatedFruit);
     window_.draw(rect);
     window_.display();
 }
@@ -327,9 +359,22 @@ void Snake::Move() {
         score_++;
         collected_fruits.emplace_back(fruit_);
         std::cout << "You picked: " << fruit_.image << std::endl;
+
+
+
+
+        music.play();
+
+//        sf::SoundBuffer buffer;
+//        if (!buffer.loadFromFile("crunch.wav")){
+//            std::cout << "sound not loaded!";
+//        }
+//
+//        sf::Sound sound;
+//        sound.setBuffer(buffer);
+//        sound.play();
+
         fruit_ = CreateFruit();
-
-
 
         for (const auto &item:collected_fruits) {
             std::cout << item.image << " ";

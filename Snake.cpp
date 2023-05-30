@@ -10,6 +10,8 @@
 #include <algorithm>
 
 #include <SFML/Graphics.hpp>
+#include <sysinfoapi.h>
+#include <windows.h>
 // XOR
 // snake can't reverse direction
 #define REVERSED_DIRECTION_X (0b0001 ^ 0b0010)
@@ -22,6 +24,7 @@ int startAlpha = 0;
 int endAlpha = 255;
 int targetTime = 3000;
 sf::RectangleShape fade;
+auto snake_color = sf::Color::Yellow;
 
 
 
@@ -69,11 +72,28 @@ void Snake::Run() {
 
     }
 }
+COLORREF GetRandomColor(void)
+{
+#define COLORREF_BASE		(256)
+    srand(GetTickCount());
+    BYTE byRed, byGreen, byBlue;
+
+    byRed = rand() % COLORREF_BASE;
+    byGreen = rand() % COLORREF_BASE;
+    byBlue = rand() % COLORREF_BASE;
+    return RGB(byRed, byGreen, byBlue);
+}
 
 void Snake::HandleEvent(const sf::Event &e) {
     if (e.type == sf::Event::Closed) {
         window_.close();
     } else if (e.type == sf::Event::KeyPressed) {
+
+        if(e.key.code == sf::Keyboard::B){
+            snake_color = sf::Color(GetRandomColor());
+            std::cout << "BUY BUTTON PRESSED";
+        }
+
         if (e.key.code >= 71 && e.key.code <= 74) {
             auto new_dir{static_cast<Direction>(std::pow(2, e.key.code - 71))};
 
@@ -140,9 +160,7 @@ void Snake::Draw(Direction &direction) {
 //            rect.setOutlineThickness(1);
 //        }
 
-        if (score_ % 5 == 0) {
-            std::cout << "YESS";
-        }
+
 
 
         // TODO need tidy up code
@@ -182,7 +200,7 @@ void Snake::Draw(Direction &direction) {
             rect.setTexture(&textureFront);
         } else {
             rect.setTexture(nullptr);
-            rect.setFillColor(sf::Color::Green);
+            rect.setFillColor(snake_color);
             rect.setOutlineColor(BACKGROUND_COLOR);
             rect.setOutlineThickness(1);
         }
@@ -193,13 +211,15 @@ void Snake::Draw(Direction &direction) {
     //rect.setFillColor(sf::Color::Red);
     rect.setPosition(fruit_.x * PIXEL_SIZE + 1, fruit_.y * PIXEL_SIZE + 1);
 
+
     sf::Texture texture;
-    if (!texture.loadFromFile("apple.jpg")) {
+    if (!texture.loadFromFile(fruit_.image)) {
         // Handle error loading texture
     }
 
     // Set the texture of the rectangle shape
-    rect.setFillColor(sf::Color::White);
+    //rect.setFillColor(sf::Color::White);
+   // texture.create(40,40);
     rect.setTexture(&texture);
 
 
@@ -305,6 +325,7 @@ void Snake::Move() {
     if (new_head.x == fruit_.x && new_head.y == fruit_.y) {
         score_++;
         fruit_ = CreateFruit();
+        std::cout << "You picked: " << fruit_.image << std::endl;
         SetTitle();
     } else {
         // Destroying each previous rendering Rectangle
@@ -333,9 +354,24 @@ pos Snake::CreateFruit() {
     std::uniform_int_distribution<> next(0, FIELD_SIZE - 1);
 
 
+
+    const int NUM_IMAGES = 5;
+    std::srand(std::time(0));
+    std::string images[NUM_IMAGES] = {
+            "melon.jpg",
+            "pineapple.png",
+            "apple.jpg",
+            "cherry.png",
+            "banana.png",
+    };
+    int randomIndex = std::rand() % NUM_IMAGES;
+
+
+
+
     //pos koordinate{1, 2};
 
-    pos new_fruit{next(gen), next(gen)};
+    pos new_fruit{next(gen), next(gen), images[randomIndex]};
     auto f = [&new_fruit](const pos &val) {
         return new_fruit.x == val.x && new_fruit.y == val.y;
     };

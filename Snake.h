@@ -19,6 +19,7 @@ const int SHAPE_SIZE = PIXEL_SIZE - 5;
 const int FIELD_SIZE = SCREEN_WIDTH / PIXEL_SIZE;
 struct pos {
     std::int32_t y{}, x{};
+    std::string image = "apple.jpg";
 };
 
 enum class Direction {
